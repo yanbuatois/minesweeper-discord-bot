@@ -1,0 +1,16 @@
+{
+  "name": "minesweeper-bot",
+  "version": "1.0.0",
+  "description": "A Discord bot which creates a minesweeper",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Dracoctix",
+  "license": "MIT",
+  "dependencies": {
+    "discord-js-command-client": "^1.0.0-3",
+    "dotenv": "^6.2.0",
+    "minesweeper": "^1.0.5"
+  }
+}
