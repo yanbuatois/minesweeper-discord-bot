@@ -6,27 +6,42 @@ const client = new CommandClient('!');
 const minesweeper = require('minesweeper');
 client.enableHelp = false;
 
+/**
+ * Permet de répondre à un message en anticipant le problème des permissions.
+ * @param {MessageEvent} originalMessage Message auquel répondre.
+ * @param {string} messageToReply Message à envoyer
+ * @returns {Promise<any>} Promesse correspondant à l'envoi d'une réponse.
+ */
+function sendMessage(originalMessage, messageToReply) {
+  let retour = null;
+  if(messageToReply !== '' && (originalMessage.channel.type === 'dm' || originalMessage.channel.type === 'group' || originalMessage.channel.memberPermissions(client.user).has("SEND_MESSAGES"))) {
+    retour = originalMessage.channel.send(messageToReply);
+  }
+
+  return retour;
+}
+
 client.registerCommand('minesweeper', async (message, commandName, args) => {
   try {
     const argcommande = args.map(elt => parseInt(elt));
     const valide = argcommande.every(valeur => valeur === undefined || !isNaN(valeur));
     if(!valide) {
-      await message.reply('Your parameters must be numbers.');
+      await sendMessage(message, 'Your parameters must be numbers.');
       return;
     }
     const rows = argcommande[0] || 10;
     const cols = argcommande[1] || 10;
     const mines = argcommande[2] || 15;
     if(rows > config.MAXROWS || rows <= config.MINROWS)  {
-      await message.reply(`Rows number is too high or too low. Please type ${config.MINROWS} to ${config.MAXROWS}.`);
+      await sendMessage(message, `Rows number is too high or too low. Please type ${config.MINROWS} to ${config.MAXROWS}.`);
       return;
     }
     if(cols > config.MAXCOLS || cols <= config.MINCOLS) {
-      await message.reply(`Columns number is too high or too low. Please type a value between ${config.MINCOLS} to ${config.MAXCOLS}.`);
+      await sendMessage(message, `Columns number is too high or too low. Please type a value between ${config.MINCOLS} to ${config.MAXCOLS}.`);
       return;
     }
     if(mines <= 0 || mines > (cols*rows)) {
-      await message.reply(`Mine number is too high or too low. Please type a value between 1 to the cases amount (here ${cols*rows}).`);
+      await sendMessage(message, `Mine number is too high or too low. Please type a value between 1 to the cases amount (here ${cols*rows}).`);
       return;
     }
     const mineArray = minesweeper.generateMineArray({
@@ -36,7 +51,7 @@ client.registerCommand('minesweeper', async (message, commandName, args) => {
     });
     const board = new minesweeper.Board(mineArray);
     const grid = board.grid();
-    const chars = grid.map(elt => elt.map(casemine => '||:' + testNumberMine(casemine) + ':||'));
+    const chars = grid.map(elt => elt.map(casemine => '||:' + testNumberMine(casemine) + ':|| '));
     const lignes = chars.map(elt => elt.join(''));
     
     let taille = 0;
@@ -59,12 +74,12 @@ client.registerCommand('minesweeper', async (message, commandName, args) => {
     }
 
     for(const post of messages) {
-      await message.channel.send(post);
+      await sendMessage(message, post);
     }
   }
   catch(error) {
     console.error(error);
-    message.reply('An error occured : ' + error.message)
+    sendMessage(message, 'An error occured : ' + error.message)
       .catch(() => {
        console.log("Message non-délivré."); 
       });
