@@ -17,16 +17,17 @@ client.registerCommand('minesweeper', async (message, commandName, args) => {
     const rows = argcommande[0] || 10;
     const cols = argcommande[1] || 10;
     const mines = argcommande[2] || 15;
-    if(rows > 99 || rows <= 0)  {
-      await message.reply('Rows number is too high or too low. Please type 1 to 99.');
+    if(rows > config.MAXROWS || rows <= config.MINROWS)  {
+      await message.reply(`Rows number is too high or too low. Please type ${config.MINROWS} to ${config.MAXROWS}.`);
       return;
     }
-    if(cols > 99 || cols <= 0) {
-      await message.reply('Columns number is too high or too low. Please type 1 to 99.');
+    if(cols > config.MAXCOLS || cols <= config.MINCOLS) {
+      await message.reply(`Columns number is too high or too low. Please type a value between ${config.MINCOLS} to ${config.MAXCOLS}.`);
       return;
     }
     if(mines <= 0 || mines > (cols*rows)) {
-      await message.reply(`Mine number is too high or too low. Please type 1 to the cases amount (here ${cols*rows}).`);
+      await message.reply(`Mine number is too high or too low. Please type a value between 1 to the cases amount (here ${cols*rows}).`);
+      return;
     }
     const mineArray = minesweeper.generateMineArray({
       rows,
